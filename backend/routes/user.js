@@ -1,13 +1,10 @@
 const express = require('express');
+const router = express.Router();
+
 const zod = require('zod');
 const { User, Account} = require('../db');
 const jwt = require('jsonwebtoken');
-const authMiddleware = require('../middleware/authMiddleware');
-const bulkRouter = require('./bulk')
-
-
-const router = express.Router();
-
+const { authMiddleware } = require('../middleware/authMiddleware');
 
 // SIGNUP
 const UserSignupSchema = zod.object({
@@ -30,13 +27,18 @@ router.post('/signup', async(req, res) => {
         username: req.body.username
     })
 
-    if(existingUser._id) {
+    if(existingUser) {
         return res.status(411).json({
             message: "Email already taken / Incorrect inputs"
         })
     }
 
-    const newUser = await User.create(req.body);
+    const newUser = await User.create({
+        username: req.body.username,
+        password: req.body.password,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName
+    });
 
     // creating account for the user with random balance
     await Account.create({
@@ -45,7 +47,7 @@ router.post('/signup', async(req, res) => {
     })
 
     const token = jwt.sign({
-        username: newUser._id
+        userId: newUser._id
     }, process.env.JWT_SECRET);
 
     res.status(200).json({
@@ -69,11 +71,14 @@ router.post('/signin', authMiddleware, async(req, res) => {
         })
     }
 
-    const user = await User.findOne(req.body);
+    const user = await User.findOne({
+        username: req.body.username,
+        password: req.body.password
+    });
 
     if(user) {
         const token = jwt.sign({
-            username: user._id
+            userId: user._id
         }, process.env.JWT_SECRET);
 
         res.status(200).json({
@@ -113,7 +118,44 @@ router.put('/update', authMiddleware, async(req, res) => {
 
 
 // SCEARCH FOR OTHER USERS
-router.use('/bulk', bulkRouter);
+router.get('/bulk', async(req, res) => {
+    try {
+        const filter = req.query.filter || "";
+    
+        const usersFound = await User.find({
+            $or: [{
+                firstName: {
+                    "$regex": filter
+                }
+            }, {
+                lastName: {
+                    "$regex": filter
+                }
+            }]
+        })
+    
+        if(usersFound.length === 0) {
+            return res.status(411).json({
+                message: "Searched user is not present"
+            })
+        }
+    
+        res.status(200).json({
+            user: usersFound.map(user => ({
+                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                _id: user._id
+            }))
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Internal server error"
+        });
+    }
+})
 
 
 module.exports = router;
