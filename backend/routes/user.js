@@ -11,13 +11,16 @@ const signupSchema = zod.object({
     username: zod.string().email({ message: "Invalid email address" }),
     firstName: zod.string(),
     lastName: zod.string(),
-    password: zod.string().min(6,{message: "Given password is too small"})
+    password: zod.string()
 })
 
 router.post('/signup', async(req, res) => {
 
-    const { success } = signupSchema.safeParse(req.body);
-    if( !success ) {
+    console.log(req.body);
+
+    const result = signupSchema.safeParse(req.body);
+
+    if( !result.success ) {
         return res.status(411).json({
             message: "Incorrect inputs"
         })

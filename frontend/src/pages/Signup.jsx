@@ -1,13 +1,12 @@
-import { useState } from 'react';
-
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import { Heading } from "../components/Heading";
 import { Subheading } from "../components/Subheading";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { WarningOption } from "../components/WarningOption";
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 
 export const Signup = () => {
     const [firstName, setFirstName] = useState("");
@@ -15,6 +14,25 @@ export const Signup = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
+
+    async function handelClick() {
+        try {
+            console.log({username, firstName, lastName, password});
+            const { data } = await axios.post(
+                "http://localhost:3000/api/v1/user/signup",
+                {
+                    username,
+                    firstName,
+                    lastName,
+                    password,
+                }
+            );
+            localStorage.setItem("token", data.token);
+            navigate("/dashboard");
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     return (
         <div className="bg-slate-300 h-screen flex justify-center">
@@ -56,26 +74,8 @@ export const Signup = () => {
                     />
 
                     <div className="p-4">
-                        <Button
-                            onClick={async () => {
-                                const res = await axios.post(
-                                    "http://localhost:3000/api/v1/user/signup",
-                                    {
-                                        username,
-                                        firstName,
-                                        lastName,
-                                        password,
-                                    }, {
-                                        headers:{
-                                            'Content-Type': 'application/json'
-                                        }
-                                    }
-                                );
-                                localStorage.setItem("token", res.data.token);
-                                navigate("/dashboard");
-                            }}
-                            label="Sign Up"
-                        />
+                        <button onClick={handelClick} label="Sign Up" >hsgkshiogesi</button>
+
                     </div>
 
                     <WarningOption
