@@ -1,12 +1,13 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useState } from 'react';
+
 
 import { Heading } from "../components/Heading";
 import { Subheading } from "../components/Subheading";
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { WarningOption } from "../components/WarningOption";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 export const Signup = () => {
     const [firstName, setFirstName] = useState("");
@@ -14,25 +15,6 @@ export const Signup = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const navigate = useNavigate();
-
-    async function handelClick() {
-        try {
-            console.log({username, firstName, lastName, password});
-            const { data } = await axios.post(
-                "http://localhost:3000/api/v1/user/signup",
-                {
-                    username,
-                    firstName,
-                    lastName,
-                    password,
-                }
-            );
-            localStorage.setItem("token", data.token);
-            navigate("/dashboard");
-        } catch (err) {
-            console.log(err);
-        }
-    }
 
     return (
         <div className="bg-slate-300 h-screen flex justify-center">
@@ -44,7 +26,6 @@ export const Signup = () => {
                         onChange={(e) => {
                             setFirstName(e.target.value);
                         }}
-                        value={firstName}
                         label="First Name"
                         placeholder="John"
                     />
@@ -52,9 +33,7 @@ export const Signup = () => {
                     <Input
                         onChange={(e) => {
                             setLastName(e.target.value);
-                            console.log(e.target.value);
                         }}
-                        value={lastName}
                         label="Last Name"
                         placeholder="Doe"
                     />
@@ -63,7 +42,6 @@ export const Signup = () => {
                         onChange={(e) => {
                             setUsername(e.target.value);
                         }}
-                        value={username}
                         label="Email"
                         placeholder="example@gmail.com"
                     />
@@ -72,15 +50,32 @@ export const Signup = () => {
                         onChange={(e) => {
                             setPassword(e.target.value);
                         }}
-                        value={password}
                         label="Password"
                         placeholder="*******"
                         type="password"
                     />
 
                     <div className="p-4">
-                        <button onClick={handelClick}>hsgkshiogesi</button>
-
+                        <Button
+                            onClick={async () => {
+                                const res = await axios.post(
+                                    "http://localhost:3000/api/v1/user/signup",
+                                    {
+                                        username,
+                                        firstName,
+                                        lastName,
+                                        password,
+                                    }, {
+                                        headers:{
+                                            'Content-Type': 'application/json'
+                                        }
+                                    }
+                                );
+                                localStorage.setItem("token", res.data.token);
+                                navigate("/dashboard");
+                            }}
+                            label="Sign Up"
+                        />
                     </div>
 
                     <WarningOption
