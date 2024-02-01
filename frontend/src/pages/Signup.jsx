@@ -44,6 +44,7 @@ export const Signup = () => {
                         onChange={(e) => {
                             setFirstName(e.target.value);
                         }}
+                        value={firstName}
                         label="First Name"
                         placeholder="John"
                     />
@@ -51,7 +52,9 @@ export const Signup = () => {
                     <Input
                         onChange={(e) => {
                             setLastName(e.target.value);
+                            console.log(e.target.value);
                         }}
+                        value={lastName}
                         label="Last Name"
                         placeholder="Doe"
                     />
@@ -60,6 +63,7 @@ export const Signup = () => {
                         onChange={(e) => {
                             setUsername(e.target.value);
                         }}
+                        value={username}
                         label="Email"
                         placeholder="example@gmail.com"
                     />
@@ -68,13 +72,14 @@ export const Signup = () => {
                         onChange={(e) => {
                             setPassword(e.target.value);
                         }}
+                        value={password}
                         label="Password"
                         placeholder="*******"
                         type="password"
                     />
 
                     <div className="p-4">
-                        <button onClick={handelClick} label="Sign Up" >hsgkshiogesi</button>
+                        <button onClick={handelClick}>hsgkshiogesi</button>
 
                     </div>
 
